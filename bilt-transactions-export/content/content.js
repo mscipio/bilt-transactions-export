@@ -192,7 +192,11 @@ class BiltTransactionExtractor {
     const amountStr = amountMatch[0];
     const isNegative = amountStr.includes('-') || amountText.includes('(');
     const amount = parseFloat(amountMatch[1].replace(/,/g, ''));
-    const finalAmount = isNegative ? -amount : amount;
+    
+    // Flip the sign for Actual Budget compatibility:
+    // Bilt shows expenses as positive, but Actual Budget expects expenses as negative
+    // Bilt shows credits/refunds as negative, but Actual Budget expects them as positive
+    const finalAmount = isNegative ? amount : -amount;
     
     return {
       date: date,
