@@ -7,6 +7,7 @@ class PopupController {
   constructor() {
     this.transactions = [];
     this.isProcessing = false;
+    this.filterSelection = null;
     this.init();
   }
 
@@ -83,6 +84,7 @@ class PopupController {
       }
 
       this.transactions = response.transactions || [];
+      this.filterSelection = response.filterSelection || null;
 
       if (this.transactions.length === 0) {
         throw new Error('No transactions found. Tips: 1) Make sure transactions are visible on the page 2) Try scrolling to load more transactions 3) Check browser console (F12) for debug info');
@@ -118,8 +120,14 @@ class PopupController {
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `bilt-transactions-${timestamp}.csv`;
+      // Use filter selection for filename if available, otherwise use timestamp
+      let filenameSuffix;
+      if (this.filterSelection && this.filterSelection.length > 0) {
+        filenameSuffix = this.filterSelection;
+      } else {
+        filenameSuffix = new Date().toISOString().split('T')[0];
+      }
+      const filename = `bilt-transactions-${filenameSuffix}.csv`;
 
       await chrome.downloads.download({
         url: url,

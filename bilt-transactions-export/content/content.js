@@ -16,6 +16,10 @@ class BiltTransactionExtractor {
     const seenSignatures = new Set();
     
     try {
+      // Get filter selection from the dropdown
+      const filterSelection = this.getFilterSelection();
+      console.log('[Bilt Export] Filter selection:', filterSelection);
+      
       // Get all elements in document order
       const allElements = Array.from(document.querySelectorAll('*'));
       
@@ -28,6 +32,7 @@ class BiltTransactionExtractor {
         return {
           success: false,
           transactions: [],
+          filterSelection: filterSelection,
           error: 'No date headers found. Make sure transactions are visible on the page.'
         };
       }
@@ -67,6 +72,7 @@ class BiltTransactionExtractor {
         success: this.transactions.length > 0,
         transactions: this.transactions,
         count: this.transactions.length,
+        filterSelection: filterSelection,
         error: this.transactions.length === 0 ? 'No transactions found' : null
       };
     } catch (error) {
@@ -232,6 +238,84 @@ class BiltTransactionExtractor {
 
   formatDate(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  /**
+   * Get the current filter selection from the dropdown
+   * Returns text like "February, 2026" or "All Time"
+   */
+  getFilterSelection() {
+    try {
+      // Look for the filter dropdown button - it has role="combobox" and contains the filter text
+      const filterButton = document.querySelector('button[role="combobox"]');
+      if (filterButton) {
+        // The text is inside nested spans
+        const textSpan = filterButton.querySelector('span span span');
+        if (textSpan) {
+          const filterText = this.getText(textSpan);
+          // Clean up the text for use in filename
+          return this.sanitizeFilename(filterText);
+        }
+        // Fallback: get text from the button itself
+        const buttonText = this.getText(filterButton);
+        // Remove the dropdown arrow/caret icon text if present
+        const cleanText = buttonText.replace(/[^\w\s,\-]/g, '').trim();
+        if (cleanText) {
+          return this.sanitizeFilename(cleanText);
+        }
+      }
+      
+      // Alternative: look for the text directly with common class patterns
+      const alternativeSelectors = [
+        '[class*="sc-iitTBb"]',  // The specific class from the user's example
+        '[class*="filter"]',
+        '[class*="dropdown"] [class*="text"]',
+        'button[id*="_r_n_"]'
+      ];
+      
+      for (const selector of alternativeSelectors) {
+        const el = document.querySelector(selector);
+        if (el) {
+          const text = this.getText(el);
+          if (text && text.length > 0 && text.length < 50) {
+            return this.sanitizeFilename(text);
+          }
+        }
+      }
+      
+      // If nothing found, use current date as fallback
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    } catch (error) {
+      console.log('[Bilt Export] Could not get filter selection:', error);
+      // Fallback to current date
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+  }
+
+  /**
+   * Sanitize text for use in filename
+   * Removes/replaces characters that are invalid in filenames
+   */
+  sanitizeFilename(text) {
+    if (!text || typeof text !== 'string') {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+    
+    return text
+      .trim()
+      // Replace commas with hyphens
+      .replace(/,/g, '-')
+      // Replace spaces with hyphens
+      .replace(/\s+/g, '-')
+      // Remove any other invalid filename characters
+      .replace(/[<>"/\\|?*]/g, '')
+      // Remove multiple consecutive hyphens
+      .replace(/-+/g, '-')
+      // Remove leading/trailing hyphens
+      .replace(/^-+|-+$/g, '');
   }
 }
 

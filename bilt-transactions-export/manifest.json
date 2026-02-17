@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bilt Transactions Export",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Export Bilt Rewards transactions to CSV for Actual Budget import",
   "permissions": [
     "activeTab",
