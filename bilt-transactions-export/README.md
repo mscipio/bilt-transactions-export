@@ -217,9 +217,9 @@ bilt-transactions-export/
 ├── lib/
 │   └── tesseract.min.js   # OCR library (for future use)
 └── icons/
-    ├── icon16.svg         # Toolbar icon
-    ├── icon48.svg         # Extension page icon
-    └── icon128.svg        # Chrome Web Store icon
+    ├── icon16.png         # Toolbar icon (Bilt brand)
+    ├── icon48.png         # Extension page icon (Bilt brand)
+    └── icon128.png        # Chrome Web Store icon (Bilt brand)
 ```
 
 ### Technologies Used
