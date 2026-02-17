@@ -1,189 +1,291 @@
 # Bilt Transactions Export
 
-A Chrome browser extension that extracts transaction data from the Bilt Rewards website and exports it to CSV format compatible with Actual Budget import.
+A Chrome browser extension that extracts transaction data from the Bilt Rewards website and exports it to CSV format compatible with Actual Budget and other personal finance applications.
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## 📋 Table of Contents
+
+- [What It Does](#what-it-does)
+- [Features](#features)
+- [Installation](#installation)
+- [How to Use](#how-to-use)
+- [CSV Format](#csv-format)
+- [Troubleshooting](#troubleshooting)
+- [Privacy & Security](#privacy--security)
+- [Development](#development)
+
+## What It Does
+
+This extension helps you export your Bilt Rewards credit card transactions so you can import them into budgeting software like **Actual Budget**. Instead of manually copying transaction data, this tool automatically extracts:
+
+- **Transaction dates** - Converted to standard YYYY-MM-DD format
+- **Payee/Merchant names** - Clean descriptions of where you spent money
+- **Transaction amounts** - Positive for credits, negative for debits
+
+The extension runs entirely in your browser and processes all data locally on your device.
 
 ## Features
 
-- **DOM-Based Extraction**: Primary extraction method parses the page DOM directly for maximum accuracy
-- **OCR Fallback**: Uses Tesseract.js for OCR-based extraction if DOM parsing fails
-- **Local Processing**: All data processing happens locally on your device
-- **Privacy-Focused**: No data is sent to external servers (unless you enable cloud OCR)
-- **CSV Export**: Generates properly formatted CSV files for Actual Budget import
+✅ **One-Click Extraction** - Extract all visible transactions with a single click  
+✅ **Smart DOM Parsing** - Automatically identifies transaction data on Bilt pages  
+✅ **Live Preview** - See extracted transactions before downloading  
+✅ **CSV Export** - Generates properly formatted CSV files for easy import  
+✅ **Privacy-First** - No data sent to external servers  
+✅ **Local Processing** - All extraction happens on your device  
+✅ **Duplicate Detection** - Automatically removes duplicate transactions  
 
 ## Installation
 
-### From Source (Developer Mode)
+### Method 1: Chrome Web Store (Coming Soon)
 
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" (toggle in top-right corner)
-4. Click "Load unpacked"
-5. Select the `bilt-transactions-export` folder
-6. The extension icon should appear in your Chrome toolbar
+Once published, you'll be able to install directly from the Chrome Web Store.
 
-### Icons Setup
+### Method 2: Developer Mode (Current)
 
-Before using, you need to add icon files:
+Since this extension is not yet published, you'll need to install it in developer mode:
 
-1. Create three PNG icons (16x16, 48x48, 128x128 pixels) in the `icons/` folder
-2. Name them: `icon16.png`, `icon48.png`, `icon128.png`
-3. Icons should represent the Bilt brand or export functionality
+1. **Download the extension**
+   ```bash
+   git clone https://github.com/mscipio/bilt-transactions-export.git
+   ```
+   Or download and extract the ZIP file from GitHub
 
-## Usage
+2. **Open Chrome Extensions page**
+   - Type `chrome://extensions/` in your Chrome address bar
+   - Press Enter
 
-1. Navigate to the Bilt Rewards transactions page (`https://www.biltrewards.com/...`)
-2. Ensure transactions are visible on the page
-3. Click the extension icon in the Chrome toolbar
-4. Click "Extract Transactions"
-5. Review the preview (first 10 transactions shown)
-6. Click "Download CSV" to save the file
-7. Import the CSV into Actual Budget
+3. **Enable Developer Mode**
+   - Toggle the "Developer mode" switch in the top-right corner
+   - You should see new buttons appear
 
-## How It Works
+4. **Load the Extension**
+   - Click the **"Load unpacked"** button
+   - Navigate to the `bilt-transactions-export/bilt-transactions-export` folder
+   - Click **"Select"**
 
-### DOM Extraction (Primary Method)
+5. **Verify Installation**
+   - You should see "Bilt Transactions Export" in your extensions list
+   - The extension icon will appear in your Chrome toolbar (you may need to pin it)
 
-The extension analyzes the page structure to:
-1. Find date headers (e.g., "February 14, 2026", "Yesterday")
-2. Locate transaction blocks under each date
-3. Extract payee names and amounts
-4. Normalize dates to ISO format (YYYY-MM-DD)
+### Pinning the Extension (Recommended)
 
-### OCR Fallback (Secondary Method)
+1. Click the puzzle piece icon 🧩 in Chrome's toolbar
+2. Find "Bilt Transactions Export" in the list
+3. Click the pin icon 📌 next to it
+4. The extension icon will now stay visible in your toolbar
 
-If DOM extraction fails:
-1. Captures a screenshot of the page
-2. Runs Tesseract.js OCR locally
-3. Parses OCR text to extract transactions
-4. Falls back gracefully if OCR also fails
+## How to Use
+
+### Step 1: Navigate to Bilt Rewards
+
+1. Go to [Bilt Rewards](https://www.biltrewards.com) and log in to your account
+2. Navigate to your **transactions page** (usually under "Activity" or "Transactions")
+3. **Important**: Make sure transactions are visible on the page
+   - Scroll down to load more transactions if needed
+   - The extension can only extract what's currently displayed
+
+### Step 2: Extract Transactions
+
+1. Click the **Bilt Export** icon in your Chrome toolbar
+2. The popup will show your current status
+3. Click the **"Extract Transactions"** button
+4. Wait for the extraction to complete (you'll see a progress bar)
+
+### Step 3: Review & Download
+
+1. Review the preview showing the first 10 transactions
+2. Check that the transaction count looks correct
+3. Click **"Download CSV"** to save the file
+4. Choose where to save the file (default name: `bilt-transactions-YYYY-MM-DD.csv`)
+
+### Step 4: Import to Actual Budget
+
+1. Open Actual Budget
+2. Go to the account where you want to import transactions
+3. Click **"Import Transactions"** or similar
+4. Select the downloaded CSV file
+5. Map the columns if needed:
+   - Date → Date
+   - Payee → Payee
+   - Amount → Amount
 
 ## CSV Format
 
-The exported CSV includes these columns:
+The exported CSV file contains these columns:
 
-| Column | Description |
-|--------|-------------|
-| Date | Transaction date (YYYY-MM-DD) |
-| Payee | Merchant or transaction description |
-| Amount | Transaction amount (negative for debits) |
-| Category | Empty (for manual categorization) |
-| Memo | Empty (for notes) |
+| Column | Format | Example |
+|--------|--------|---------|
+| **Date** | YYYY-MM-DD | 2026-02-14 |
+| **Payee** | Text | Starbucks |
+| **Amount** | Number (positive/negative) | -12.50 |
+| **Category** | Empty | (for manual entry) |
+| **Memo** | Empty | (for notes) |
 
-## Supported Date Formats
+### Amount Sign Convention
 
-- Full dates: "February 14, 2026"
-- Relative: "Today", "Yesterday"
-- Standard: "MM/DD/YYYY"
+- **Negative amounts** (-12.50) = Money you spent (debit)
+- **Positive amounts** (50.00) = Money received (credit/refund)
 
-## Architecture
+## Troubleshooting
+
+### "Please navigate to the Bilt Rewards transactions page"
+
+**Problem**: You're not on a Bilt Rewards URL  
+**Solution**: 
+- Make sure you're on `https://www.biltrewards.com`
+- Navigate to the Activity/Transactions section
+- The URL should contain "bilt.com" or "biltrewards.com"
+
+### "No transactions found"
+
+**Problem**: The extension can't find transaction data  
+**Solutions**:
+1. Make sure transactions are **visible** on the page (scroll down)
+2. **Refresh the page** and try again
+3. Check that you're on the correct Bilt page
+4. Look at the browser console (F12) for debug information
+
+### "Cannot connect to page"
+
+**Problem**: The content script isn't loading  
+**Solutions**:
+1. **Refresh the Bilt page** completely
+2. Check that the extension has permission to run on bilt.com
+3. Try disabling and re-enabling the extension
+4. Reload the extension from `chrome://extensions/`
+
+### Extension icon not showing
+
+**Problem**: The extension isn't pinned  
+**Solution**:
+1. Click the puzzle piece 🧩 icon in Chrome
+2. Find "Bilt Transactions Export"
+3. Click the pin icon 📌
+
+### Download not working
+
+**Problem**: Browser blocking download  
+**Solutions**:
+1. Check your Downloads folder
+2. Make sure Chrome has permission to download files
+3. Try using "Save As" to choose a specific location
+
+## Privacy & Security
+
+### What We Collect
+
+**Nothing.** This extension:
+- ✅ Does NOT collect personal data
+- ✅ Does NOT track your browsing
+- ✅ Does NOT send data to external servers
+- ✅ Does NOT store data after you close the popup
+
+### What We Access
+
+The extension only accesses:
+- **Bilt Rewards pages** (to extract transaction data)
+- **Browser storage** (to save your preferences)
+- **Downloads** (to save the CSV file)
+
+### Data Processing
+
+All processing happens **locally on your device**:
+1. Data is extracted from the webpage
+2. Processed in your browser
+3. Saved as a CSV file on your computer
+4. **No data leaves your device**
+
+## Development
+
+### Project Structure
 
 ```
 bilt-transactions-export/
 ├── manifest.json          # Extension configuration
-├── popup/                 # Extension popup UI
-│   ├── popup.html
-│   ├── popup.js
-│   └── popup.css
-├── content/               # Content script (runs on Bilt pages)
-│   └── content.js
-├── background/            # Service worker
-│   └── background.js
-├── modules/               # Shared modules
-│   ├── dom-extractor.js  # DOM extraction logic
-│   ├── csv.js            # CSV generation
-│   └── utils.js          # Utility functions
-├── lib/                   # Third-party libraries
-│   └── tesseract.min.js  # OCR engine
-└── icons/                 # Extension icons
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+├── background/
+│   └── background.js      # Service worker for tab capture
+├── content/
+│   └── content.js         # Content script (runs on Bilt pages)
+├── popup/
+│   ├── popup.html         # Popup UI
+│   ├── popup.js           # Popup logic
+│   └── popup.css          # Popup styles
+├── modules/
+│   └── csv.js             # CSV generation utilities
+├── lib/
+│   └── tesseract.min.js   # OCR library (for future use)
+└── icons/
+    ├── icon16.svg         # Toolbar icon
+    ├── icon48.svg         # Extension page icon
+    └── icon128.svg        # Chrome Web Store icon
 ```
 
-## Technical Details
+### Technologies Used
 
-### DOM Selectors Used
+- **Manifest V3** - Latest Chrome extension format
+- **Vanilla JavaScript** - No frameworks needed
+- **Chrome Extension APIs**:
+  - `chrome.tabs` - Tab management
+  - `chrome.scripting` - Content script injection
+  - `chrome.storage` - Local settings storage
+  - `chrome.downloads` - File downloads
 
-Based on analysis of the Bilt Rewards page structure:
-- Date headers: Identified by date pattern matching
-- Payee elements: `p[class*="fwWhJc"]`, `p[class*="fhbElE"]`
-- Amount detection: Pattern matching for `$XXX.XX`
+### Local Development
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mscipio/bilt-transactions-export.git
+   cd bilt-transactions-export/bilt-transactions-export
+   ```
+
+2. Make your changes to the source files
+
+3. Reload the extension in Chrome:
+   - Go to `chrome://extensions/`
+   - Click the refresh 🔄 icon on the extension
+   - Or press `Cmd+R` (Mac) / `Ctrl+R` (Windows)
+
+4. Test on the Bilt Rewards transactions page
 
 ### Browser Compatibility
 
-- Chrome 88+ (Manifest V3)
-- Edge 88+ (Chromium-based)
-- Other Chromium browsers supporting Manifest V3
-
-## Troubleshooting
-
-### "No transactions found" Error
-
-1. Make sure you're on the Bilt Rewards transactions page
-2. Ensure transactions are visible (scroll to load more if needed)
-3. Try refreshing the page
-4. Enable "Use OCR if DOM extraction fails" option
-
-### Extension Not Working
-
-1. Check that the extension is enabled in `chrome://extensions/`
-2. Verify you're on a Bilt Rewards URL
-3. Check the browser console for error messages
-4. Try reloading the extension
-
-### OCR Not Working
-
-1. OCR requires page screenshot permission
-2. Some pages may block screenshot capture
-3. Try the DOM extraction method instead
-
-## Privacy & Security
-
-- **No External Servers**: Data is processed entirely on your device
-- **No Tracking**: No analytics or tracking scripts
-- **Local Storage Only**: Settings stored in browser's local storage
-- **Optional Cloud OCR**: Cloud OCR can be enabled but requires explicit user consent
-
-## Development
-
-### Building from Source
-
-No build step required - the extension runs directly from source files.
-
-### Testing
-
-1. Load the extension in Chrome developer mode
-2. Navigate to Bilt Rewards transactions page
-3. Test extraction with various transaction types
-4. Verify CSV output format
-
-### File Structure Notes
-
-- `content.js` is injected into Bilt pages automatically
-- `popup.js` runs in the extension popup context
-- `background.js` runs as a service worker
-- Modules in `modules/` are shared across contexts
-
-## License
-
-MIT License - See LICENSE file for details
+| Browser | Version | Status |
+|---------|---------|--------|
+| Chrome | 88+ | ✅ Supported |
+| Edge | 88+ | ✅ Supported |
+| Brave | Latest | ✅ Supported |
+| Firefox | - | ❌ Not supported (Manifest V3 differences) |
 
 ## Contributing
 
-Contributions welcome! Please:
+Contributions are welcome! Please:
+
 1. Fork the repository
-2. Create a feature branch
-3. Test your changes thoroughly
-4. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-For issues or questions:
-1. Check the Troubleshooting section above
-2. Review browser console for error messages
-3. Open an issue on the repository
+Having issues?
+
+1. Check the [Troubleshooting](#troubleshooting) section above
+2. Open the browser console (F12) and look for error messages
+3. [Open an issue](https://github.com/mscipio/bilt-transactions-export/issues) on GitHub
 
 ## Credits
 
-- Tesseract.js for OCR functionality
-- Bilt Rewards for the transaction data format
+- Built with ❤️ for the Bilt Rewards community
+- Uses [Tesseract.js](https://github.com/naptha/tesseract.js) for OCR capabilities
+- Inspired by the need for better budgeting tool integrations
+
+---
+
+**Disclaimer**: This is an unofficial extension and is not affiliated with or endorsed by Bilt Rewards. Use at your own risk. Always verify exported data before importing into financial software.
