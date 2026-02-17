@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Bilt Export</h1>
+      <p class="subtitle">Export transactions to CSV</p>
+    </header>
+
+    <div class="status-section" id="statusSection">
+      <div class="status-indicator" id="statusIndicator">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="extractBtn" class="btn btn-primary">
+        <span class="btn-icon">📊</span>
+        Extract Transactions
+      </button>
+      
+      <button id="downloadBtn" class="btn btn-secondary" disabled>
+        <span class="btn-icon">💾</span>
+        Download CSV
+      </button>
+    </div>
+
+    <div class="options">
+      <label class="checkbox-label">
+        <input type="checkbox" id="useOcrFallback" checked>
+        <span>Use OCR if DOM extraction fails</span>
+      </label>
+    </div>
+
+    <div class="preview-section" id="previewSection" style="display: none;">
+      <h3>Preview (<span id="transactionCount">0</span> transactions)</h3>
+      <div class="preview-table-container">
+        <table id="previewTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Payee</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="previewTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="progress-section" id="progressSection" style="display: none;">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p class="progress-text" id="progressText">Processing...</p>
+    </div>
+
+    <footer>
+      <p class="footer-text">Data processed locally on your device</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

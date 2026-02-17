@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Background -->
+  <rect width="48" height="48" rx="8" fill="#1a237e"/>
+  
+  <!-- Download arrow -->
+  <path d="M24 8 L24 28" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M15 20 L24 30 L33 20" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Base line -->
+  <path d="M10 36 L38 36" stroke="white" stroke-width="4" stroke-linecap="round"/>
+</svg>

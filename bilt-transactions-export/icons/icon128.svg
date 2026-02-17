@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Background -->
+  <rect width="128" height="128" rx="20" fill="#1a237e"/>
+  
+  <!-- Download arrow -->
+  <path d="M64 20 L64 75" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  <path d="M40 55 L64 80 L88 55" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Base line -->
+  <path d="M25 95 L103 95" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  
+  <!-- B letter hint -->
+  <text x="64" y="52" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">B</text>
+</svg>
