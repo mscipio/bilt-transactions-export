@@ -19,7 +19,6 @@ class PopupController {
   bindElements() {
     this.extractBtn = document.getElementById('extractBtn');
     this.downloadBtn = document.getElementById('downloadBtn');
-    this.useOcrFallback = document.getElementById('useOcrFallback');
     this.statusDot = document.getElementById('statusDot');
     this.statusText = document.getElementById('statusText');
     this.previewSection = document.getElementById('previewSection');
@@ -53,7 +52,7 @@ class PopupController {
 
       // Check if we're on Bilt Rewards (case-insensitive)
       const url = tab.url.toLowerCase();
-      if (!url.includes('bilt.com') || (!url.includes('rewards') && !url.includes('activity'))) {
+      if (!url.includes('bilt.com') && !url.includes('biltrewards.com')) {
         throw new Error(`Please navigate to the Bilt Rewards transactions page. Current URL: ${tab.url}`);
       }
 
@@ -73,17 +72,13 @@ class PopupController {
       
       this.showProgress(50, 'Extracting transactions...');
       const response = await this.sendMessageToContent(tab.id, {
-        action: 'extractTransactions',
-        useOcrFallback: this.useOcrFallback.checked
+        action: 'extractTransactions'
       });
 
       console.log('Response received:', response);
 
       if (!response || !response.success) {
         const errorMsg = response?.error || 'Extraction failed';
-        if (errorMsg.includes('Tesseract')) {
-          throw new Error('DOM extraction failed and OCR library not available. Please check browser console for details.');
-        }
         throw new Error(errorMsg);
       }
 
@@ -174,23 +169,36 @@ class PopupController {
       console.log('Message sent successfully on first try');
       return response;
     } catch (error) {
-      console.log('First attempt failed, trying to inject script...');
+      console.log('First attempt failed:', error.message);
       
-      // If that fails, inject the script and retry
-      try {
-        await this.injectContentScript(tabId);
-        console.log('Script injected, waiting for initialization...');
+      // Check if content script exists by looking for specific error
+      if (error.message.includes('Receiving end does not exist') || 
+          error.message.includes('Could not establish connection')) {
+        console.log('Content script not found, injecting...');
         
-        // Wait longer for script to initialize
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Retry sending message
-        const response = await this.trySendMessage(tabId, message);
-        console.log('Message sent successfully after injection');
-        return response;
-      } catch (injectionError) {
-        console.error('Failed to inject or send message:', injectionError);
-        throw new Error(`Cannot connect to page. Try refreshing the page and trying again. (${injectionError.message})`);
+        try {
+          await this.injectContentScript(tabId);
+          console.log('Script injected, waiting for initialization...');
+          
+          // Wait for script to initialize with increasing delays
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            await new Promise(resolve => setTimeout(resolve, 300 * attempt));
+            
+            try {
+              const response = await this.trySendMessage(tabId, message);
+              console.log('Message sent successfully after injection');
+              return response;
+            } catch (retryError) {
+              console.log(`Attempt ${attempt} failed:`, retryError.message);
+              if (attempt === 3) throw retryError;
+            }
+          }
+        } catch (injectionError) {
+          console.error('Failed to inject or send message:', injectionError);
+          throw new Error(`Cannot connect to page. Please refresh the Bilt page and try again.`);
+        }
+      } else {
+        throw error;
       }
     }
   }
@@ -207,21 +215,25 @@ class PopupController {
     });
   }
 
-  injectContentScript(tabId) {
-    return new Promise((resolve, reject) => {
-      chrome.scripting.executeScript({
+  async injectContentScript(tabId) {
+    try {
+      // Try to inject content script
+      await chrome.scripting.executeScript({
         target: { tabId: tabId },
         files: ['content/content.js'],
         injectImmediately: true
-      }, (results) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-        } else {
-          console.log('Script injection results:', results);
-          resolve(results);
-        }
       });
-    });
+      
+      console.log('Content script injected successfully');
+      
+      // Wait for script to initialize
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      return true;
+    } catch (error) {
+      console.error('Script injection failed:', error);
+      throw new Error(`Failed to inject content script: ${error.message}`);
+    }
   }
 
   updateStatus(status, message = '') {
