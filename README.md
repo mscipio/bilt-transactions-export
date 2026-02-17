@@ -5,6 +5,14 @@ A Chrome browser extension that extracts transaction data from the Bilt Rewards 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## 📥 Download & Install
+
+[![Download Extension](https://img.shields.io/badge/Download%20Extension-v1.0.0-brightgreen?style=for-the-badge&logo=googlechrome)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.0/bilt-transactions-export-v1.0.0.zip)
+
+**[⬇️ Download Latest Release (v1.0.0)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.0/bilt-transactions-export-v1.0.0.zip)**
+
+Extract the ZIP and follow the [installation instructions](#installation) below.
+
 ## 📋 What This Repository Contains
 
 This repository includes:
@@ -16,16 +24,23 @@ This repository includes:
 
 ### Installation
 
-1. **Clone or download this repository**
-   ```bash
-   git clone https://github.com/mscipio/bilt-transactions-export.git
-   ```
+**Option 1: Download Release (Recommended)**
 
-2. **Install the extension in Chrome**
+1. **[Download the latest release](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.0/bilt-transactions-export-v1.0.0.zip)**
+2. **Extract the ZIP file** to a folder on your computer
+3. **Install in Chrome:**
    - Open Chrome and navigate to `chrome://extensions/`
    - Enable "Developer mode" (toggle in top-right corner)
    - Click "Load unpacked"
-   - Select the `bilt-transactions-export/bilt-transactions-export` folder
+   - Select the extracted `bilt-transactions-export` folder
+
+**Option 2: Clone Repository (For Developers)**
+
+```bash
+git clone https://github.com/mscipio/bilt-transactions-export.git
+```
+
+Then follow step 3 above, selecting the `bilt-transactions-export/bilt-transactions-export` folder.
 
 3. **Pin the extension**
    - Click the puzzle piece 🧩 icon in Chrome's toolbar
