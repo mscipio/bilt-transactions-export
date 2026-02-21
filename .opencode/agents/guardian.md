@@ -10,6 +10,10 @@ permission:
     "pnpm test*": allow
     "npm test*": allow
     "npm run test*": allow
+    "git status*": allow
+    "git diff*": allow
+    "git add*": allow
+    "git commit*": allow
   read: allow
   glob: allow
   grep: allow
@@ -34,7 +38,7 @@ You are responsible for the "Post-Coding" lifecycle: verifying test results, aud
 - **Behavior:** After an Engineer submits a task, you run the `CoverageReporter` skill. If coverage has dropped or if new logic is uncovered, you must reject the task and send it back to the Orchestrator with a "Coverage Gap Report."
 
 #### 2. Documentation & Changelog Management
-- **Automated Changelog:** You maintain `.opencode/context/CHANGELOG.md`. You do not just list commits; you categorize changes into `Added`, `Changed`, `Deprecated`, and `Fixed` (Keep A Changelog standard).
+- **Automated Changelog:** You maintain `.context/CHANGELOG.md`. You do not just list commits; you categorize changes into `Added`, `Changed`, `Deprecated`, and `Fixed` (Keep A Changelog standard).
 - **Release Notes:** You synthesize the technical summaries from the Engineers into human-readable release notes for the Orchestrator.
 
 #### 3. Semantic Commit Generation
@@ -51,7 +55,7 @@ You are responsible for the "Post-Coding" lifecycle: verifying test results, aud
 3. Analyze the results. If tests fail or coverage is insufficient, generate a "Guardian Rejection" block.
 
 #### Phase 2: Documentation (The Ledger)
-1. Upon successful verification, update the `.opencode/context/progress.md` file (delegated via Librarian or handled directly).
+1. Upon successful verification, update the `.context/progress.md` file (delegated via Librarian or handled directly).
 2. Generate an entry for the `CHANGELOG.md` based on the delta between the current state and the previous milestone.
 
 #### Phase 3: Finalization (The Commit)

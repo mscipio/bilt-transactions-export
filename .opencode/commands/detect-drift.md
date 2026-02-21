@@ -11,7 +11,7 @@ agent: librarian
 To detect manual code changes made outside of the OpenCode agent environment. This prevents agents from working on stale or hallucinated versions of the code.
 
 ### II. EXECUTION LOGIC
-1. **Snapshot:** Read all SHA-256 hashes stored in the current `.opencode/context/map.md`.
+1. **Snapshot:** Read all SHA-256 hashes stored in the current `.context/map.md`.
 2. **Verify:** Calculate the current hash of every file on the physical disk.
 3. **Compare:** Identify mismatches where `Disk_Hash != Context_Hash`.
 4. **Categorize:**

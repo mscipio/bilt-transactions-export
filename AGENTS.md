@@ -21,6 +21,8 @@ Phase 4: CodeReviewer → quality review
      ↓
 Phase 5: Guardian → coverage + commit
      ↓
+Orchestrator → git push
+     ↓
 Librarian → sync context
 ```
 
@@ -28,7 +30,7 @@ Librarian → sync context
 
 | Agent | Mode | Role |
 |-------|------|------|
-| orchestrator | primary | Strategic lead, workflow management |
+| orchestrator | primary | Strategic lead, workflow management, git push & branch management |
 | sentinel | primary | Security vulnerability scanning |
 | code-reviewer | primary | Code quality review |
 | test-engineer | primary | Test writing (unit/integration/e2e) |
@@ -79,7 +81,8 @@ Librarian → sync context
 ## Approval Gates
 
 - **Plan Approval**: Required before Phase 3 (execution begins)
-- **Commit Approval**: Required before git commit
+- **Commit Approval**: Required before Guardian commits (Phase 5)
+- **Push Approval**: Required before Orchestrator pushes to remote
 
 ## Agent Flow
 
@@ -91,6 +94,8 @@ Engineer + TestEngineer (parallel)
     CodeReviewer (quality)
         ↓
       Guardian (commit)
+        ↓
+    Orchestrator (push)
         ↓
      Librarian (sync)
 ```
@@ -145,6 +150,11 @@ Engineer + TestEngineer (parallel)
 /security-scan       # Quick security scan
 /audit              # Full security audit
 /code-review        # Code quality review
+
+# Git Operations
+/commit              # Create commit (Guardian)
+/push                # Push to remote (Orchestrator)
+/branch              # Manage branches (Orchestrator)
 
 # Development
 /refactor            # Refactor code

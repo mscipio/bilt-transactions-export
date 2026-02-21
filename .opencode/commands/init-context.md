@@ -8,10 +8,10 @@ agent: librarian
 ## Version: 1.0.0
 
 ### I. PURPOSE
-To perform the initial high-fidelity scan of a repository and establish the `.opencode/context/` directory structure. This command is the "Big Bang" of the agent's knowledge.
+To perform the initial high-fidelity scan of a repository and establish the `.context/` directory structure. This command is the "Big Bang" of the agent's knowledge.
 
 ### II. EXECUTION LOGIC
-1. **Scaffold:** Create `.opencode/context/`, `.opencode/context/history/`, and `.opencode/context/symbols/`.
+1. **Scaffold:** Create `.context/`, `.context/history/`, and `.context/symbols/`.
 2. **Scan:** Recursively list all files (respecting `.gitignore`).
 3. **Analyze:**
     - Identify the primary tech stack (languages, frameworks).
@@ -23,7 +23,7 @@ To perform the initial high-fidelity scan of a repository and establish the `.op
 A structured report to the Orchestrator confirming:
 - Number of files indexed.
 - Primary languages detected.
-- Confirmation that the `.opencode/context/` vault is ready for subagent use.
+- Confirmation that the `.context/` vault is ready for subagent use.
 
 ### IV. ERROR HANDLING
 - **Missing Permissions:** If directory creation fails, exit with code 1 and request elevated OS permissions.
