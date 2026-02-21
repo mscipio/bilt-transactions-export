@@ -37,7 +37,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["modules/*", "lib/*"],
+      "resources": ["modules/*"],
       "matches": [
         "https://*.bilt.com/*",
         "https://*.biltrewards.com/*"

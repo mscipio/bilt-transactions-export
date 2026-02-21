@@ -214,8 +214,6 @@ bilt-transactions-export/
 │   └── popup.css          # Popup styles
 ├── modules/
 │   └── csv.js             # CSV generation utilities
-├── lib/
-│   └── tesseract.min.js   # OCR library (for future use)
 └── icons/
     ├── icon16.png         # Toolbar icon (Bilt brand)
     ├── icon48.png         # Extension page icon (Bilt brand)
@@ -283,7 +281,6 @@ Having issues?
 ## Credits
 
 - Built with ❤️ for the Bilt Rewards community
-- Uses [Tesseract.js](https://github.com/naptha/tesseract.js) for OCR capabilities
 - Inspired by the need for better budgeting tool integrations
 
 ---
