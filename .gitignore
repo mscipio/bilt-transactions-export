@@ -45,3 +45,6 @@ coverage/
 
 # Chrome extension packaging
 *.zip
+# OpenCode Agent directories
+.opencode/
+.context/
