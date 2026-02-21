@@ -2,7 +2,7 @@
 
 A Chrome browser extension that extracts transaction data from the Bilt Rewards website and exports it to CSV format compatible with Actual Budget and other personal finance applications.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.4-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📥 Download & Install
@@ -11,7 +11,7 @@ A Chrome browser extension that extracts transaction data from the Bilt Rewards 
 
 **[⬇️ Download Latest Release (v1.0.4)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.4/bilt-transactions-export-v1.0.4.zip)**
 
-*Latest: Fixed amount signs for Actual Budget compatibility*
+*Latest: Enhanced popup UI with progress indicator, live preview table, and smart filenames*
 
 Extract the ZIP and follow the [installation instructions](#installation) below.
 
@@ -53,9 +53,11 @@ Then follow step 3 above, selecting the `bilt-transactions-export/bilt-transacti
 1. Go to [Bilt Rewards](https://www.biltrewards.com) and navigate to your transactions page
 2. Make sure transactions are visible (scroll down to load more)
 3. Click the **Bilt Export** icon in your toolbar
-4. Click **"Extract Transactions"**
-5. Review the preview and click **"Download CSV"**
-6. Import the CSV into Actual Budget or your preferred finance app
+4. Click **Extract Transactions** in the popup
+5. Watch the progress indicator as transactions are extracted
+6. Review the **live preview** table showing transaction details
+7. Click **Download CSV** to save the file
+8. Import the CSV into Actual Budget or your preferred finance app
 
 ## 📖 Full Documentation
 
@@ -70,6 +72,11 @@ For detailed instructions, troubleshooting, and development info, see the **[ext
 - ✅ **Privacy-First** - No data sent to external servers
 - ✅ **Local Processing** - All extraction happens on your device
 - ✅ **Duplicate Detection** - Automatically removes duplicate transactions
+- ✅ **Progress Indicator** - Visual feedback during extraction
+- ✅ **Smart Filenames** - Uses date/filter selection for CSV filenames
+- ✅ **Auto Script Injection** - Automatically loads content script if needed
+- ✅ **Status Indicator** - Shows ready/processing/error states
+- ✅ **Enhanced Error Handling** - Helpful tips when extraction fails
 
 ## 🔒 Privacy & Security
 
