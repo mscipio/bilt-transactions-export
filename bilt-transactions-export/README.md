@@ -2,7 +2,7 @@
 
 A Chrome browser extension that extracts transaction data from the Bilt Rewards website and exports it to CSV format compatible with Actual Budget and other personal finance applications.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.4-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📋 Table of Contents
@@ -22,16 +22,18 @@ This extension helps you export your Bilt Rewards credit card transactions so yo
 
 - **Transaction dates** - Converted to standard YYYY-MM-DD format
 - **Payee/Merchant names** - Clean descriptions of where you spent money
-- **Transaction amounts** - Positive for credits, negative for debits
+- **Transaction amounts** - Negative for expenses, positive for credits (Actual Budget compatible)
 
 The extension runs entirely in your browser and processes all data locally on your device.
 
 ## Features
 
 ✅ **One-Click Extraction** - Extract all visible transactions with a single click  
-✅ **Smart DOM Parsing** - Automatically identifies transaction data on Bilt pages  
+✅ **Smart DOM Parsing** - Automatically identifies transaction data on Bilt pages (no OCR)  
+✅ **Filter-Based Filenames** - CSV files named after your selected date range (e.g., "February 2026")  
 ✅ **Live Preview** - See extracted transactions before downloading  
 ✅ **CSV Export** - Generates properly formatted CSV files for easy import  
+✅ **Actual Budget Compatible** - Expenses exported as negative, credits as positive  
 ✅ **Privacy-First** - No data sent to external servers  
 ✅ **Local Processing** - All extraction happens on your device  
 ✅ **Duplicate Detection** - Automatically removes duplicate transactions  
@@ -98,7 +100,7 @@ Since this extension is not yet published, you'll need to install it in develope
 1. Review the preview showing the first 10 transactions
 2. Check that the transaction count looks correct
 3. Click **"Download CSV"** to save the file
-4. Choose where to save the file (default name: `bilt-transactions-YYYY-MM-DD.csv`)
+4. Choose where to save the file (default name: `bilt-transactions-{filter-selection}.csv`, e.g., `bilt-transactions-February-2026.csv`)
 
 ### Step 4: Import to Actual Budget
 
