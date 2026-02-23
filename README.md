@@ -2,16 +2,16 @@
 
 A Chrome browser extension that extracts transaction data from the Bilt Rewards website and exports it to CSV format compatible with Actual Budget and other personal finance applications.
 
-![Version](https://img.shields.io/badge/version-1.0.5-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📥 Download & Install
 
-[![Download Extension](https://img.shields.io/badge/Download%20Extension-v1.0.5-brightgreen?style=for-the-badge&logo=googlechrome)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.5/bilt-transactions-export-v1.0.5.zip)
+[![Download Extension](https://img.shields.io/badge/Download%20Extension-v1.1.0-brightgreen?style=for-the-badge&logo=googlechrome)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.1.0/bilt-transactions-export-v1.1.0.zip)
 
-**[⬇️ Download Latest Release (v1.0.5)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.5/bilt-transactions-export-v1.0.5.zip)**
+**[⬇️ Download Latest Release (v1.1.0)](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.1.0/bilt-transactions-export-v1.1.0.zip)**
 
-*Latest: Release v1.0.5*
+*Latest: Release v1.1.0*
 
 Extract the ZIP and follow the [installation instructions](#installation) below.
 
@@ -28,7 +28,7 @@ This repository includes:
 
 **Option 1: Download Release (Recommended)**
 
-1. **[Download the latest release](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.0.5/bilt-transactions-export-v1.0.5.zip)**
+1. **[Download the latest release](https://github.com/mscipio/bilt-transactions-export/releases/download/v1.1.0/bilt-transactions-export-v1.1.0.zip)**
 2. **Extract the ZIP file** to a folder on your computer
 3. **Install in Chrome:**
    - Open Chrome and navigate to `chrome://extensions/`
