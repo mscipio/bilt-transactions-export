@@ -29,7 +29,8 @@ The extension runs entirely in your browser and processes all data locally on yo
 ## Features
 
 ✅ **One-Click Extraction** - Extract all visible transactions with a single click  
-✅ **Smart DOM Parsing** - Automatically identifies transaction data on Bilt pages (no OCR)  
+✅ **All Transaction Types** - Detects Bilt card, dining, shopping, and rent payments  
+✅ **Smart DOM Parsing** - Position-based DOM traversal for robust extraction  
 ✅ **Filter-Based Filenames** - CSV files named after your selected date range (e.g., "February 2026")  
 ✅ **Live Preview** - See extracted transactions before downloading  
 ✅ **CSV Export** - Generates properly formatted CSV files for easy import  
@@ -37,6 +38,7 @@ The extension runs entirely in your browser and processes all data locally on yo
 ✅ **Privacy-First** - No data sent to external servers  
 ✅ **Local Processing** - All extraction happens on your device  
 ✅ **Duplicate Detection** - Automatically removes duplicate transactions  
+✅ **Pending Transaction Filter** - Option to exclude pending transactions  
 
 ## Installation
 
@@ -64,7 +66,7 @@ Since this extension is not yet published, you'll need to install it in develope
 
 4. **Load the Extension**
    - Click the **"Load unpacked"** button
-   - Navigate to the `bilt-transactions-export/bilt-transactions-export` folder
+   - Navigate to the `bilt-transactions-export` folder
    - Click **"Select"**
 
 5. **Verify Installation**
@@ -237,7 +239,7 @@ bilt-transactions-export/
 1. Clone the repository:
    ```bash
    git clone https://github.com/mscipio/bilt-transactions-export.git
-   cd bilt-transactions-export/bilt-transactions-export
+   cd bilt-transactions-export
    ```
 
 2. Make your changes to the source files

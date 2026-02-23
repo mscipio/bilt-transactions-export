@@ -19,8 +19,8 @@ Extract the ZIP and follow the [installation instructions](#installation) below.
 
 This repository includes:
 - **Complete Chrome Extension** (`bilt-transactions-export/`) - Ready to install and use
-- **Planning Documents** (`planning/`) - Project context, requirements, and architecture
-- **Development Context** (`.opencode/context/`) - Code quality standards and project intelligence
+- **Project Context** (`.context/`) - Planning documents and project intelligence
+- **Development System** (`.opencode/`) - OpenCode agent system for automated development
 
 ## 🚀 Quick Start
 
@@ -42,9 +42,9 @@ This repository includes:
 git clone https://github.com/mscipio/bilt-transactions-export.git
 ```
 
-Then follow step 3 above, selecting the `bilt-transactions-export/bilt-transactions-export` folder.
+Then follow step 3 above, selecting the `bilt-transactions-export` folder.
 
-3. **Pin the extension**
+4. **Pin the extension**
    - Click the puzzle piece 🧩 icon in Chrome's toolbar
    - Find "Bilt Transactions Export" and click the pin 📌 icon
 
@@ -66,9 +66,11 @@ For detailed instructions, troubleshooting, and development info, see the **[ext
 ## ✨ Features
 
 - ✅ **One-Click Extraction** - Extract all visible transactions instantly
-- ✅ **Smart DOM Parsing** - Automatically identifies transaction data on Bilt pages  
+- ✅ **All Transaction Types** - Detects Bilt card, dining, shopping, and rent payments
+- ✅ **Smart DOM Parsing** - Position-based DOM traversal for robust extraction
 - ✅ **Live Preview** - See extracted transactions before downloading
 - ✅ **CSV Export** - Generates properly formatted CSV files
+- ✅ **Actual Budget Compatible** - Expenses as negative, credits as positive
 - ✅ **Privacy-First** - No data sent to external servers
 - ✅ **Local Processing** - All extraction happens on your device
 - ✅ **Duplicate Detection** - Automatically removes duplicate transactions
@@ -77,6 +79,7 @@ For detailed instructions, troubleshooting, and development info, see the **[ext
 - ✅ **Auto Script Injection** - Automatically loads content script if needed
 - ✅ **Status Indicator** - Shows ready/processing/error states
 - ✅ **Enhanced Error Handling** - Helpful tips when extraction fails
+- ✅ **Pending Transaction Filter** - Option to exclude pending transactions
 
 ## 🔒 Privacy & Security
 
@@ -97,12 +100,14 @@ bilt-transactions-export/
 │   ├── popup/
 │   ├── modules/
 │   └── README.md                 # Detailed extension documentation
-├── planning/                     # Project planning documents
-│   ├── 01_context.md
-│   ├── 02_requirements.md
-│   ├── 03_design_concepts.md
-│   └── ...
-└── .opencode/context/           # Development context and standards
+├── .context/                     # Project context and planning
+│   ├── plans/
+│   ├── progress.md
+│   └── map.md
+└── .opencode/                    # OpenCode agent system
+    ├── agents/
+    ├── skills/
+    └── rules/
 ```
 
 ## 📄 License
