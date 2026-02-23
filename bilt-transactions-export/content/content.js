@@ -336,21 +336,35 @@ class BiltTransactionExtractor {
   }
 
   /**
-   * Check if element is a transaction row (has Bilt card icon)
-   * @param {Element} element - The element to check
-   * @returns {boolean} True if element is a transaction row
+   * Array of transaction icon data-testid values to detect
+   * @type {string[]}
    */
+  static TRANSACTION_ICONS = [
+    'icon-bilt-card-regular',     // Bilt card charges
+    'icon-dining-vertical-regular', // Dining purchases
+    'icon-shopping-bag-fill',     // Shopping purchases
+    'icon-pay-rent-regular'       // Rent payments
+  ];
+
+  /**
+    * Check if element is a transaction row
+    * @param {Element} element - The element to check
+    * @returns {boolean} True if element is a transaction row
+    */
   isTransactionRow(element) {
     if (!element) return false;
     
-    // Check for Bilt card icon using data-testid
-    const cardIcon = element.querySelector('[data-testid="icon-bilt-card-regular"]');
-    if (cardIcon) return true;
-    
-    // Also check if element itself has the icon
-    if (element.getAttribute && 
-        element.getAttribute('data-testid') === 'icon-bilt-card-regular') {
-      return true;
+    // Check for any transaction icon using data-testid
+    for (const iconType of BiltTransactionExtractor.TRANSACTION_ICONS) {
+      // Check if element contains the icon
+      const icon = element.querySelector(`[data-testid="${iconType}"]`);
+      if (icon) return true;
+      
+      // Also check if element itself has the icon
+      if (element.getAttribute && 
+          element.getAttribute('data-testid') === iconType) {
+        return true;
+      }
     }
     
     return false;
@@ -413,17 +427,19 @@ class BiltTransactionExtractor {
       }
     }
     
-    // Fallback: find first meaningful text after card icon
-    const cardIcon = row.querySelector('[data-testid="icon-bilt-card-regular"]');
-    if (cardIcon) {
-      // Get the next sibling text content after the icon
-      let sibling = cardIcon.nextElementSibling;
-      while (sibling) {
-        const text = this.getText(sibling).trim();
-        if (text && text.length >= 2) {
-          return text;
+    // Fallback: find first meaningful text after any transaction icon
+    for (const iconType of BiltTransactionExtractor.TRANSACTION_ICONS) {
+      const cardIcon = row.querySelector(`[data-testid="${iconType}"]`);
+      if (cardIcon) {
+        // Get the next sibling text content after the icon
+        let sibling = cardIcon.nextElementSibling;
+        while (sibling) {
+          const text = this.getText(sibling).trim();
+          if (text && text.length >= 2) {
+            return text;
+          }
+          sibling = sibling.nextElementSibling;
         }
-        sibling = sibling.nextElementSibling;
       }
     }
     
