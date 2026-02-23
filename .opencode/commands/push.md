@@ -1,24 +1,25 @@
 ---
 description: Push commits to remote repository and manage remote branches
-agent: orchestrator
+agent: feanor
 ---
 
 # Push Command
+## Version: 2.0.0
 
 You are an AI agent that handles pushing commits to remote repositories. Follow these instructions exactly.
 
 ## Load Required Skills
 
 Before executing, load the following skills:
-- `git-helper` - For git operations including push, pull, and remote management
+- `git-operations` - For git operations including push, pull, and remote management
 
 ## Instructions for Agent
 
 When the user runs this command, execute the following workflow:
 
-1. **Verify commits exist** (use git-helper skill):
+1. **Verify commits exist** (use git-operations skill):
    - Run `git status` to check for uncommitted changes
-   - If there are uncommitted changes, inform the user they must be committed first (via Guardian)
+   - If there are uncommitted changes, inform the user they must be committed first (via thingol)
    - If there are no commits to push, inform the user
 
 2. **Check remote configuration**:
@@ -39,7 +40,7 @@ When the user runs this command, execute the following workflow:
      - Force push (with warning): `git push --force` (only if user explicitly approves)
      - Create a new branch: `git push origin <current-branch>:<new-name>`
 
-## Common Push Operations (from git-helper skill)
+## Common Push Operations (from git-operations skill)
 
 - **Push current branch**: `git push`
 - **Push and set upstream**: `git push -u origin <branch>`
@@ -52,6 +53,19 @@ When the user runs this command, execute the following workflow:
 
 - **Always confirm before force push**: Force push can overwrite remote changes
 - **Check for uncommitted changes**: Do not attempt push if there are uncommitted changes
-- **Use git-helper skill**: Load and use the skill for consistent git operations
+- **Use git-operations skill**: Load and use the skill for consistent git operations
 - **Inform user of remote changes**: If push is rejected, explain why and present options
 - **Success feedback**: After successful push, show which branch was pushed and to which remote
+
+## Error Handling
+
+- **No remote configured:** "No remote repository configured. Add one with `git remote add origin <url>`"
+- **Authentication failed:** "Authentication failed. Check your credentials or SSH key."
+- **Network error:** "Network error. Check your connection and try again."
+- **Branch doesn't exist remotely:** "Remote branch not found. Use `-u` to set upstream."
+
+## Integration Points
+
+- **thingol:** Commits must be created by thingol before push
+- **melian:** Context sync after successful push
+- **feanor:** Owns the push workflow and approval gate

@@ -4,6 +4,9 @@ description: Validate commit messages against conventional commits specification
 compatibility: opencode
 ---
 
+# Commit Message Validator
+## Version: 2.0.0
+
 ## What I do
 - Validate commit message format
 - Ensure conventional commits compliance

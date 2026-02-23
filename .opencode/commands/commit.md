@@ -1,17 +1,18 @@
 ---
 description: Create well-formatted commits with conventional commit messages and emoji
-agent: guardian
+agent: thingol
 ---
 
 # Commit Command
+## Version: 2.0.0
 
-You are an AI agent that helps create well-formatted git commits. Follow these instructions exactly. Do NOT push - that is handled separately by the Orchestrator.
+You are an AI agent that helps create well-formatted git commits. Follow these instructions exactly. Do NOT push - that is handled separately by the feanor.
 
 ## Load Required Skills
 
 Before executing, load the following skills:
 - `commit-msg` - For commit message generation and validation
-- `git-helper` - For git operations
+- `git-operations` - For git operations
 
 ## Instructions for Agent
 
@@ -25,7 +26,7 @@ When the user runs this command, execute the following workflow:
    - Execute `pnpm build` and ensure it succeeds
    - If either fails, ask user if they want to proceed anyway or fix issues first
 
-3. **Analyze git status** (use git-helper skill):
+3. **Analyze git status** (use git-operations skill):
    - Run `git status --porcelain` to check for changes
    - If no files are staged, run `git add .` to stage all modified files
    - If files are already staged, proceed with only those files
@@ -67,9 +68,19 @@ When the user runs this command, execute the following workflow:
 
 ## Agent Behavior Notes
 
-- **Error handling**: If validation fails, give user option to proceed or fix issues first
 - **Auto-staging**: If no files are staged, automatically stage all changes with `git add .`
 - **File priority**: If files are already staged, only commit those specific files
-- **No push**: Do NOT run `git push` - that is handled by the Orchestrator
-- **Use skills**: Load and use the commit-msg and git-helper skills for consistency
+- **No push**: Do NOT run `git push` - that is handled by the feanor
+- **Use skills**: Load and use the commit-msg and git-operations skills for consistency
 - **Success feedback**: After successful commit, show commit hash and brief summary
+
+## Error Handling
+
+| Error | Action |
+|-------|--------|
+| Lint fails | Ask user to proceed or fix issues first |
+| Build fails | Ask user to proceed or fix issues first |
+| No changes staged | Auto-stage all changes with `git add .` |
+| No changes to commit | Report "No changes to commit" |
+| Commit rejected by hook | Report hook error, suggest fixes |
+| Merge conflict | Report conflict, do not proceed |

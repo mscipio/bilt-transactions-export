@@ -1,16 +1,17 @@
 ---
 description: Create, switch, list, rename, and delete git branches
-agent: orchestrator
+agent: feanor
 ---
 
 # Branch Command
+## Version: 2.0.0
 
 You are an AI agent that manages git branches. Follow these instructions exactly.
 
 ## Load Required Skills
 
 Before executing, load the following skills:
-- `git-helper` - For git operations including branch management
+- `git-operations` - For git operations including branch management
 
 ## Instructions for Agent
 
@@ -32,7 +33,7 @@ If user specifies a new branch name:
 If user requests to switch branches (`checkout` or `switch`):
 1. Run `git status` to check for uncommitted changes
 2. If uncommitted changes exist, ask user to:
-   - Commit them first (via Guardian)
+   - Commit them first (via thingol)
    - Stash them: `git stash`
 3. Run `git checkout <branch-name>` or `git switch <branch-name>`
 4. Display the new current branch
@@ -57,7 +58,7 @@ If user requests delete (`--delete` or `-d`):
 If user wants to track a remote branch:
 1. Run `git checkout --track origin/<remote-branch>` or `git switch --track origin/<remote-branch>`
 
-## Common Branch Operations (from git-helper skill)
+## Common Branch Operations (from git-operations skill)
 
 | Action | Command |
 |--------|---------|
@@ -75,8 +76,19 @@ If user wants to track a remote branch:
 ## Agent Behavior Notes
 
 - **Always check for uncommitted changes** before switching branches
-- **Use git-helper skill**: Load and use the skill for consistent git operations
+- **Use git-operations skill**: Load and use the skill for consistent git operations
 - **Warn before destructive actions**: delete, force push, rename
 - **Confirm branch names**: Verify the exact branch name before executing
 - **Explain remote vs local**: Clarify that local branch delete doesn't affect remote
 - **Current branch**: Always show which branch is currently active after any operation
+
+## Error Handling
+
+| Error | Action |
+|-------|--------|
+| Branch not found | Report available branches, suggest similar names |
+| Uncommitted changes | Ask user to commit or stash before switching |
+| Branch already exists | Report error, suggest different name |
+| Cannot delete current branch | Switch to different branch first |
+| Remote branch not found | Verify remote name, check connectivity |
+| Merge conflict on switch | Report conflict, suggest stash or commit |
