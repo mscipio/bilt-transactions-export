@@ -74,15 +74,13 @@ class BiltTransactionExtractor {
         
         console.log(`[Bilt Export] Found ${transactions.length} transactions for ${currentDate.date}`);
         
-        for (const transEl of transactions) {
-          const transaction = this.extractTransaction(transEl, currentDate.date);
-          if (transaction) {
-            const signature = `${transaction.date}|${transaction.payee}|${transaction.amount}`;
-            if (!seenSignatures.has(signature)) {
-              seenSignatures.add(signature);
-              this.transactions.push(transaction);
-              console.log(`[Bilt Export] Extracted: ${transaction.date} - ${transaction.payee} - $${transaction.amount}`);
-            }
+        // transactions is now already parsed, not DOM elements
+        for (const transaction of transactions) {
+          const signature = `${transaction.date}|${transaction.payee}|${transaction.amount}`;
+          if (!seenSignatures.has(signature)) {
+            seenSignatures.add(signature);
+            this.transactions.push(transaction);
+            console.log(`[Bilt Export] Extracted: ${transaction.date} - ${transaction.payee} - $${transaction.amount}`);
           }
         }
       }
@@ -181,9 +179,10 @@ class BiltTransactionExtractor {
 
   /**
    * Extract transactions from a transaction container element
+   * Returns fully parsed transaction objects, not DOM elements
    * @param {Element} container - The transaction container element
    * @param {string} date - The date string for these transactions
-   * @returns {Element[]} Array of transaction row elements
+   * @returns {Object[]} Array of parsed transaction objects
    */
   extractTransactionsFromContainer(container, date) {
     const transactions = [];
@@ -201,7 +200,23 @@ class BiltTransactionExtractor {
       if (this.isTransactionRow(row)) {
         // Verify it's not a points row
         if (!this.isPointsRow(row)) {
-          transactions.push(row);
+          // Extract data using new helpers
+          const payee = this.extractPayee(row);
+          const amountText = this.extractAmount(row);
+          
+          if (payee && amountText) {
+            const amount = this.parseAmount(amountText);
+            if (this.validateTransaction(payee, amount)) {
+              transactions.push({
+                date: date,
+                payee: payee,
+                amount: amount,
+                category: '',
+                memo: ''
+              });
+            }
+          }
+          
           // Mark this and all children as processed
           processedElements.add(row);
           row.querySelectorAll('*').forEach(child => processedElements.add(child));
