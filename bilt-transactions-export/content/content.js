@@ -3,6 +3,26 @@
  * Runs on Bilt Rewards pages and handles DOM extraction
  */
 
+/**
+ * SELECTOR HISTORY - For reference if position-based approach needs debugging
+ * 
+ * Old selectors (May 2024 - before DOM restructure):
+ * - Transaction row: .sc-eXnvfo
+ * - Payee: .fwWhJc 
+ * - Amount: .lkndMw
+ * 
+ * New selectors (February 2026):
+ * - Transaction row: .sc-eXnvfo (still works)
+ * - Payee: .fhbElE (changed from .fwWhJc)
+ * - Amount: .lkndMw (still works)
+ * 
+ * Position-based approach uses:
+ * - Date headers: text pattern + parent class contains 'sc-ksXGtu'
+ * - Transaction container: sibling after date header
+ * - Transaction row: contains [data-testid="icon-bilt-card-regular"]
+ * - Points row: contains [data-testid="icon-bilt-points-regular"]
+ */
+
 console.log('[Bilt Export] Content script loading on:', window.location.href);
 
 class BiltTransactionExtractor {
@@ -48,7 +68,8 @@ class BiltTransactionExtractor {
         const transactions = this.findTransactionsInRange(
           allElements, 
           currentDate.index, 
-          nextDate ? nextDate.index : allElements.length
+          nextDate ? nextDate.index : allElements.length,
+          currentDate
         );
         
         console.log(`[Bilt Export] Found ${transactions.length} transactions for ${currentDate.date}`);
@@ -90,9 +111,43 @@ class BiltTransactionExtractor {
     const datePattern = /^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s*\d{4}|^(Yesterday|Today)$/i;
     const headers = [];
     
+    // First, try the stable pattern: p elements with sc-mHBLV class, parent has sc-ksXGtu or hTvhYZ
+    const stableDateElements = document.querySelectorAll('p.sc-mHBLV, p[class*="sc-mHBLV"]');
+    
+    for (const el of stableDateElements) {
+      const parent = el.parentElement;
+      if (!parent) continue;
+      
+      const parentClass = parent.className || '';
+      const hasValidParent = typeof parentClass === 'string' && 
+        (parentClass.includes('sc-ksXGtu') || parentClass.includes('hTvhYZ'));
+      
+      if (!hasValidParent) continue;
+      
+      const text = this.getText(el);
+      if (!text) continue;
+      
+      // Remove any extra text like "• Rent Day" before matching
+      const cleanText = text.split('•')[0].trim();
+      
+      if (datePattern.test(cleanText) && text.length < 100 && !text.includes('$')) {
+        const date = this.parseDate(cleanText);
+        // Find index in allElements array
+        const index = allElements.indexOf(el);
+        if (index !== -1) {
+          headers.push({ date, index, element: el, text: cleanText });
+        }
+      }
+    }
+    
+    // Fallback: use original method for any dates not found via stable pattern
+    // This ensures backwards compatibility if the stable pattern misses some dates
     for (let i = 0; i < allElements.length; i++) {
       const el = allElements[i];
       const text = this.getText(el);
+      
+      // Skip if already captured via stable pattern
+      if (headers.some(h => h.element === el)) continue;
       
       // Check if this is a date header
       // Remove any extra text like "• Rent Day" before matching
@@ -124,32 +179,53 @@ class BiltTransactionExtractor {
     return headers;
   }
 
-  findTransactionsInRange(allElements, startIndex, endIndex) {
+  /**
+   * Extract transactions from a transaction container element
+   * @param {Element} container - The transaction container element
+   * @param {string} date - The date string for these transactions
+   * @returns {Element[]} Array of transaction row elements
+   */
+  extractTransactionsFromContainer(container, date) {
     const transactions = [];
+    if (!container) return transactions;
+    
+    // Find all transaction rows within this container
+    const rows = container.querySelectorAll('*');
     const processedElements = new Set();
     
-    // Look at elements between start and end
-    for (let i = startIndex; i < endIndex && i < allElements.length; i++) {
-      const el = allElements[i];
-      
+    for (const row of rows) {
       // Skip if already processed
-      if (processedElements.has(el)) continue;
+      if (processedElements.has(row)) continue;
       
-      // Check if this is a transaction row container (sc-eXnvfo class)
-      if (el.className && typeof el.className === 'string' && 
-          el.className.includes('sc-eXnvfo')) {
-        // Check if it has a payee (fwWhJc class)
-        const payeeEl = el.querySelector('.fwWhJc, [class*="fwWhJc"]');
-        if (payeeEl) {
-          const payeeText = this.getText(payeeEl);
-          if (this.isRealTransaction(payeeText)) {
-            transactions.push(el);
-            // Mark this and all children as processed
-            processedElements.add(el);
-            el.querySelectorAll('*').forEach(child => processedElements.add(child));
-          }
+      // Check if this is a transaction row (has Bilt card icon)
+      if (this.isTransactionRow(row)) {
+        // Verify it's not a points row
+        if (!this.isPointsRow(row)) {
+          transactions.push(row);
+          // Mark this and all children as processed
+          processedElements.add(row);
+          row.querySelectorAll('*').forEach(child => processedElements.add(child));
         }
       }
+    }
+    
+    return transactions;
+  }
+
+  findTransactionsInRange(allElements, startIndex, endIndex, currentDate) {
+    const transactions = [];
+    
+    // Get the date header element at startIndex
+    const dateHeaderElement = allElements[startIndex];
+    if (!dateHeaderElement) return transactions;
+    
+    // Find the transaction container as sibling after date header
+    const container = this.findTransactionContainer(dateHeaderElement);
+    
+    if (container) {
+      // Extract transactions from the container using the date
+      const containerTransactions = this.extractTransactionsFromContainer(container, currentDate.date);
+      transactions.push(...containerTransactions);
     }
     
     return transactions;
@@ -238,6 +314,262 @@ class BiltTransactionExtractor {
     }
 
     return this.formatDate(now);
+  }
+
+  /**
+   * Find transaction container element as sibling after date header
+   * @param {Element} dateHeaderElement - The date header element
+   * @returns {Element|null} The transaction container element or null
+   */
+  findTransactionContainer(dateHeaderElement) {
+    if (!dateHeaderElement) return null;
+    
+    // Get the next sibling element
+    let sibling = dateHeaderElement.nextElementSibling;
+    
+    // Walk forward until we find a transaction container or run out of siblings
+    while (sibling) {
+      if (this.isTransactionContainer(sibling)) {
+        return sibling;
+      }
+      sibling = sibling.nextElementSibling;
+    }
+    
+    return null;
+  }
+
+  /**
+   * Check if element contains transaction rows
+   * @param {Element} element - The element to check
+   * @returns {boolean} True if element contains transaction rows
+   */
+  containsTransactionRows(element) {
+    if (!element) return false;
+    
+    // Check for transaction rows using data-testid
+    const cardIcon = element.querySelector('[data-testid="icon-bilt-card-regular"]');
+    if (cardIcon) return true;
+    
+    // Fallback: check for known transaction row classes
+    if (element.className && typeof element.className === 'string' &&
+        element.className.includes('sc-eXnvfo')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Check if element is a transaction container
+   * @param {Element} element - The element to check
+   * @returns {boolean} True if element is a transaction container
+   */
+  isTransactionContainer(element) {
+    if (!element) return false;
+    
+    const className = element.className;
+    if (!className || typeof className !== 'string') return false;
+    
+    // Transaction containers have sc-eXnvfo class
+    return className.includes('sc-eXnvfo');
+  }
+
+  /**
+   * Check if element is a transaction row (has Bilt card icon)
+   * @param {Element} element - The element to check
+   * @returns {boolean} True if element is a transaction row
+   */
+  isTransactionRow(element) {
+    if (!element) return false;
+    
+    // Check for Bilt card icon using data-testid
+    const cardIcon = element.querySelector('[data-testid="icon-bilt-card-regular"]');
+    if (cardIcon) return true;
+    
+    // Also check if element itself has the icon
+    if (element.getAttribute && 
+        element.getAttribute('data-testid') === 'icon-bilt-card-regular') {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Check if element is a points/bonus row (has Bilt points icon)
+   * @param {Element} element - The element to check
+   * @returns {boolean} True if element is a points row
+   */
+  isPointsRow(element) {
+    if (!element) return false;
+    
+    // Check for Bilt points icon using data-testid
+    const pointsIcon = element.querySelector('[data-testid="icon-bilt-points-regular"]');
+    if (pointsIcon) return true;
+    
+    // Also check if element itself has the icon
+    if (element.getAttribute && 
+        element.getAttribute('data-testid') === 'icon-bilt-points-regular') {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Extract payee name from transaction row
+   * @param {Element} row - The transaction row element
+   * @returns {string|null} The payee name or null if not found
+   */
+  extractPayee(row) {
+    if (!row) return null;
+    
+    // First try the known class pattern
+    const payeeEl = row.querySelector('.fwWhJc, [class*="fwWhJc"]');
+    if (payeeEl) {
+      const payee = this.getText(payeeEl).trim();
+      if (payee && payee.length >= 2) {
+        return payee;
+      }
+    }
+    
+    // Fallback: find first meaningful text after card icon
+    const cardIcon = row.querySelector('[data-testid="icon-bilt-card-regular"]');
+    if (cardIcon) {
+      // Get the next sibling text content after the icon
+      let sibling = cardIcon.nextElementSibling;
+      while (sibling) {
+        const text = this.getText(sibling).trim();
+        if (text && text.length >= 2) {
+          return text;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Extract amount from transaction row
+   * @param {Element} row - The transaction row element
+   * @returns {string|null} The amount text or null if not found
+   */
+  extractAmount(row) {
+    if (!row) return null;
+    
+    // First try the known class pattern
+    const amountEl = row.querySelector('.lkndMw, [class*="lkndMw"]');
+    if (amountEl) {
+      const amountText = this.getText(amountEl).trim();
+      if (amountText) {
+        return amountText;
+      }
+    }
+    
+    // Fallback: search for currency pattern in the row text
+    const rowText = this.getText(row);
+    const currencyMatch = rowText.match(/\$?[\d,]+\.\d{2}/);
+    if (currencyMatch) {
+      return currencyMatch[0];
+    }
+    
+    return null;
+  }
+
+  /**
+   * Check if text is a non-transaction entry (points, bonuses, etc.)
+   * @param {string} text - The text to check
+   * @returns {boolean} True if text is non-transaction
+   */
+  isNonTransactionText(text) {
+    if (!text || typeof text !== 'string') return true;
+    
+    const normalizedText = text.trim().toLowerCase();
+    
+    const nonTransactionPatterns = [
+      /^points?$/i,
+      /^bilt\s+(mastercard|cash)/i,
+      /^2x\s+points/i,
+      /^additional\s+\dx/i,
+      /^earn\s+bilt/i,
+      /^pending$/i,
+      /^housing\s+points$/i,
+      /^rakuten\s+points/i,
+      /^expires/i,
+      /^received/i,
+      /^palladium/i,
+      /rent\s+day/i,
+      /bonus\s+\dx/i,
+      /^transfer/i,
+      /^payment/i,
+      /^credit/i,
+      /^adjustment/i,
+      /^refund/i,
+      /^redemption/i,
+      /^reward/i,
+      /^member\s+reward/i,
+      /^annual\s+fee/i,
+      /^fee\s+waived/i,
+      /^interest\s+charge/i,
+      /^late\s+fee/i,
+      /^overlimit\s+fee/i
+    ];
+    
+    return nonTransactionPatterns.some(pattern => pattern.test(normalizedText));
+  }
+
+  /**
+   * Parse amount string to numeric value
+   * @param {string} amountText - The amount text to parse
+   * @returns {number|null} The parsed numeric amount or null
+   */
+  parseAmount(amountText) {
+    if (!amountText || typeof amountText !== 'string') return null;
+    
+    const trimmed = amountText.trim();
+    
+    // Match currency pattern: $50.00, -$50.00, 50.00, (50.00)
+    const currencyMatch = trimmed.match(/-?\$?\(?([\d,]+\.\d{2})\)?/);
+    
+    if (!currencyMatch) return null;
+    
+    const amount = parseFloat(currencyMatch[1].replace(/,/g, ''));
+    
+    if (isNaN(amount)) return null;
+    
+    // Determine if it's a negative amount (expense in Bilt)
+    const isNegative = trimmed.includes('-') || trimmed.includes('(');
+    
+    // Return with sign: expenses are negative for Actual Budget
+    return isNegative ? amount : -amount;
+  }
+
+  /**
+   * Validate extracted transaction data
+   * @param {string} payee - The payee name
+   * @param {number|string} amount - The amount
+   * @returns {boolean} True if transaction data is valid
+   */
+  validateTransaction(payee, amount) {
+    // Validate payee
+    if (!payee || typeof payee !== 'string') return false;
+    
+    const trimmedPayee = payee.trim();
+    if (trimmedPayee.length < 2) return false;
+    
+    // Check if it's a non-transaction entry
+    if (this.isNonTransactionText(trimmedPayee)) return false;
+    
+    // Validate amount
+    const numericAmount = typeof amount === 'number' ? amount : this.parseAmount(amount);
+    
+    if (numericAmount === null || isNaN(numericAmount)) return false;
+    
+    // Amount should be a reasonable value (not extremely large)
+    if (Math.abs(numericAmount) > 1000000) return false;
+    
+    return true;
   }
 
   formatDate(date) {
