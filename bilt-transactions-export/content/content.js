@@ -209,6 +209,14 @@ class BiltTransactionExtractor {
       
       // Check if this is a transaction row (has Bilt card icon)
       if (this.isTransactionRow(row)) {
+        // Skip pending transactions
+        if (this.isPendingTransaction(container)) {
+          console.log('[Bilt Export] Skipping pending transaction');
+          processedElements.add(row);
+          row.querySelectorAll('*').forEach(child => processedElements.add(child));
+          continue;
+        }
+        
         // Verify it's not a points row
         if (!this.isPointsRow(row)) {
           // Extract data using new helpers
@@ -366,6 +374,25 @@ class BiltTransactionExtractor {
       return true;
     }
     
+    return false;
+  }
+
+  /**
+   * Check if transaction is pending (not yet posted)
+   * @param {Element} container - The transaction container element
+   * @returns {boolean} True if transaction is pending
+   */
+  isPendingTransaction(container) {
+    if (!container) return false;
+    
+    // Check all <p> elements for "Pending" text
+    const allPs = container.querySelectorAll('p');
+    for (const p of allPs) {
+      const text = this.getText(p).trim().toLowerCase();
+      if (text === 'pending') {
+        return true;
+      }
+    }
     return false;
   }
 
