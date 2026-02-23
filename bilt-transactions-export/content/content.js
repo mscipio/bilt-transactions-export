@@ -17,10 +17,15 @@
  * - Amount: .lkndMw (still works)
  * 
  * Position-based approach uses:
- * - Date headers: text pattern + parent class contains 'sc-ksXGtu'
- * - Transaction container: sibling after date header
+ * - Date headers: DIV with class sc-ksXGtu (parent container, NOT the P child)
+ * - Transaction container: sibling with class sc-iHDLbo (MuiStack-root)
  * - Transaction row: contains [data-testid="icon-bilt-card-regular"]
  * - Points row: contains [data-testid="icon-bilt-points-regular"]
+ * 
+ * Debug findings (Feb 2026):
+ * - Date headers appear twice: as DIV parent and P child - only use DIV
+ * - sc-eXnvfo class not found in current DOM
+ * - sc-iHDLbo is the actual transaction container class
  */
 
 console.log('[Bilt Export] Content script loading on:', window.location.href);
@@ -133,7 +138,10 @@ class BiltTransactionExtractor {
         // Find index in allElements array
         const index = allElements.indexOf(el);
         if (index !== -1) {
-          headers.push({ date, index, element: el, text: cleanText });
+          // Only add if this is not a P tag (P tags are children of the actual date header DIV)
+          if (el.tagName !== 'P') {
+            headers.push({ date, index, element: el, text: cleanText });
+          }
         }
       }
     }
@@ -166,7 +174,10 @@ class BiltTransactionExtractor {
         
         if (!isInTransaction) {
           const date = this.parseDate(cleanText);
-          headers.push({ date, index: i, element: el, text: cleanText });
+          // Only add if this is not a P tag (P tags are children of the actual date header DIV)
+          if (el.tagName !== 'P') {
+            headers.push({ date, index: i, element: el, text: cleanText });
+          }
         }
       }
     }
@@ -246,58 +257,6 @@ class BiltTransactionExtractor {
     return transactions;
   }
 
-  isRealTransaction(payeeText) {
-    const skipPatterns = [
-      /points?/i,
-      /^bilt\s+(mastercard|cash)/i,
-      /^2x\s+points/i,
-      /^additional\s+\dx/i,
-      /^earn\s+bilt/i,
-      /^pending$/i,
-      /^housing\s+points$/i,
-      /^rakuten\s+points/i,
-      /^expires/i,
-      /^received/i,
-      /^palladium/i,
-      /rent\s+day/i,
-      /bonus\s+\dx/i
-    ];
-    
-    return !skipPatterns.some(pattern => pattern.test(payeeText));
-  }
-
-  extractTransaction(element, date) {
-    const payeeEl = element.querySelector('.fwWhJc, [class*="fwWhJc"]');
-    if (!payeeEl) return null;
-    
-    const payee = this.getText(payeeEl).trim();
-    if (!payee || payee.length < 2) return null;
-    
-    const amountEl = element.querySelector('.lkndMw, [class*="lkndMw"]');
-    if (!amountEl) return null;
-    
-    const amountText = this.getText(amountEl).trim();
-    const amountMatch = amountText.match(/-?\$?([\d,]+\.\d{2})/);
-    if (!amountMatch) return null;
-    
-    const amountStr = amountMatch[0];
-    const isNegative = amountStr.includes('-') || amountText.includes('(');
-    const amount = parseFloat(amountMatch[1].replace(/,/g, ''));
-    
-    // Flip the sign for Actual Budget compatibility:
-    // Bilt shows expenses as positive, but Actual Budget expects expenses as negative
-    // Bilt shows credits/refunds as negative, but Actual Budget expects them as positive
-    const finalAmount = isNegative ? amount : -amount;
-    
-    return {
-      date: date,
-      payee: payee,
-      amount: finalAmount,
-      category: '',
-      memo: ''
-    };
-  }
-
   getText(element) {
     return (element.textContent || element.innerText || '').trim();
   }
@@ -354,27 +313,6 @@ class BiltTransactionExtractor {
   }
 
   /**
-   * Check if element contains transaction rows
-   * @param {Element} element - The element to check
-   * @returns {boolean} True if element contains transaction rows
-   */
-  containsTransactionRows(element) {
-    if (!element) return false;
-    
-    // Check for transaction rows using data-testid
-    const cardIcon = element.querySelector('[data-testid="icon-bilt-card-regular"]');
-    if (cardIcon) return true;
-    
-    // Fallback: check for known transaction row classes
-    if (element.className && typeof element.className === 'string' &&
-        element.className.includes('sc-eXnvfo')) {
-      return true;
-    }
-    
-    return false;
-  }
-
-  /**
    * Check if element is a transaction container
    * @param {Element} element - The element to check
    * @returns {boolean} True if element is a transaction container
@@ -385,8 +323,8 @@ class BiltTransactionExtractor {
     const className = element.className;
     if (!className || typeof className !== 'string') return false;
     
-    // Transaction containers have sc-eXnvfo class
-    return className.includes('sc-eXnvfo');
+    // Transaction containers have sc-iHDLbo class (MuiStack-root)
+    return className.includes('sc-iHDLbo');
   }
 
   /**
